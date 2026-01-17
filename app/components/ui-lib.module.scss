@@ -351,22 +351,32 @@
       overflow-y: auto;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 
-      // 滚动条样式优化
-      &::-webkit-scrollbar {
-        width: 8px;
+      // 滚动条样式优化 - 仅在内容溢出时显示滚动条
+      &:not(:hover) {
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+        &::-webkit-scrollbar {
+          display: none; /* Chrome/Safari/Opera */
+        }
       }
 
-      &::-webkit-scrollbar-track {
-        background-color: transparent;
-      }
+      &:hover {
+        &::-webkit-scrollbar {
+          width: 8px;
+        }
 
-      &::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.2);
-        border-radius: 4px;
-        transition: background-color 0.2s ease;
+        &::-webkit-scrollbar-track {
+          background-color: transparent;
+        }
 
-        &:hover {
-          background-color: rgba(0, 0, 0, 0.35);
+        &::-webkit-scrollbar-thumb {
+          background-color: rgba(0, 0, 0, 0.2);
+          border-radius: 4px;
+          transition: background-color 0.2s ease;
+
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.35);
+          }
         }
       }
 
