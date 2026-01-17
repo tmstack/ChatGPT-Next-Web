@@ -486,7 +486,7 @@ export function Selector<T>(props: {
   onClose?: () => void;
   multiple?: boolean;
   dropdown?: boolean; // 新增：下拉菜单模式
-  dropdownPosition?: { top: number; right: number }; // 新增：下拉菜单位置 (right 实际存储的是 center left 值)
+  dropdownPosition?: { top: number; left: number }; // 下拉菜单位置，使用按钮中心的 left 值
 }) {
   const [selectedValues, setSelectedValues] = useState<T[]>(
     Array.isArray(props.defaultSelectedValue)
@@ -522,7 +522,7 @@ export function Selector<T>(props: {
                 bottom: `${
                   window.innerHeight - props.dropdownPosition.top + 5
                 }px`,
-                left: `${props.dropdownPosition.right}px`,
+                left: `${props.dropdownPosition.left}px`,
                 transform: "translateX(-50%)",
               } as CSSProperties)
             : undefined

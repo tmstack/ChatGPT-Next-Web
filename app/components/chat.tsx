@@ -405,7 +405,7 @@ export function ChatAction(props: {
   text: string;
   icon: JSX.Element;
   onClick: () => void;
-  onPositionChange?: (position: { top: number; right: number }) => void; // right 实际存储的是 center left 值
+  onPositionChange?: (position: { top: number; left: number }) => void; // 按钮中心的 left 和 top 值
 }) {
   const iconRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -435,7 +435,7 @@ export function ChatAction(props: {
           const rect = actionRef.current.getBoundingClientRect();
           props.onPositionChange({
             top: rect.top,
-            right: rect.left + rect.width / 2,
+            left: rect.left + rect.width / 2,
           });
         }
         props.onClick();
@@ -564,7 +564,7 @@ export function ChatActions(props: {
   }, [models, currentModel, currentProviderName]);
   const [showModelSelector, setShowModelSelector] = useState(false);
   const [modelSelectorPosition, setModelSelectorPosition] = useState<
-    { top: number; right: number } | undefined
+    { top: number; left: number } | undefined
   >();
   const [showPluginSelector, setShowPluginSelector] = useState(false);
   const [showUploadImage, setShowUploadImage] = useState(false);
