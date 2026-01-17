@@ -405,9 +405,11 @@ export function ChatAction(props: {
   text: string;
   icon: JSX.Element;
   onClick: () => void;
+  onPositionChange?: (position: { top: number; right: number }) => void; // right 实际存储的是 center left 值
 }) {
   const iconRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
+  const actionRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState({
     full: 16,
     icon: 16,
@@ -426,8 +428,16 @@ export function ChatAction(props: {
 
   return (
     <div
+      ref={actionRef}
       className={clsx(styles["chat-input-action"], "clickable")}
       onClick={() => {
+        if (props.onPositionChange && actionRef.current) {
+          const rect = actionRef.current.getBoundingClientRect();
+          props.onPositionChange({
+            top: rect.top,
+            right: rect.left + rect.width / 2,
+          });
+        }
         props.onClick();
         setTimeout(updateWidth, 1);
       }}
@@ -553,6 +563,9 @@ export function ChatActions(props: {
     return model?.displayName ?? "";
   }, [models, currentModel, currentProviderName]);
   const [showModelSelector, setShowModelSelector] = useState(false);
+  const [modelSelectorPosition, setModelSelectorPosition] = useState<
+    { top: number; right: number } | undefined
+  >();
   const [showPluginSelector, setShowPluginSelector] = useState(false);
   const [showUploadImage, setShowUploadImage] = useState(false);
 
@@ -675,43 +688,53 @@ export function ChatActions(props: {
 
         <ChatAction
           onClick={() => setShowModelSelector(true)}
+          onPositionChange={(position) => setModelSelectorPosition(position)}
           text={currentModelName}
           icon={<RobotIcon />}
         />
 
-        {showModelSelector && (
-          <Selector
-            defaultSelectedValue={`${currentModel}@${currentProviderName}`}
-            items={models.map((m) => ({
-              title: `${m.displayName}${
-                m?.provider?.providerName
-                  ? " (" + m?.provider?.providerName + ")"
-                  : ""
-              }`,
-              value: `${m.name}@${m?.provider?.providerName}`,
-            }))}
-            onClose={() => setShowModelSelector(false)}
-            onSelection={(s) => {
-              if (s.length === 0) return;
-              const [model, providerName] = getModelProvider(s[0]);
-              chatStore.updateTargetSession(session, (session) => {
-                session.mask.modelConfig.model = model as ModelType;
-                session.mask.modelConfig.providerName =
-                  providerName as ServiceProvider;
-                session.mask.syncGlobalConfig = false;
-              });
-              if (providerName == "ByteDance") {
-                const selectedModel = models.find(
-                  (m) =>
-                    m.name == model &&
-                    m?.provider?.providerName == providerName,
-                );
-                showToast(selectedModel?.displayName ?? "");
-              } else {
-                showToast(model);
-              }
-            }}
-          />
+        {showModelSelector && modelSelectorPosition && (
+          <>
+            <div
+              className="modal-mask"
+              onClick={() => setShowModelSelector(false)}
+              style={{ zIndex: 9999 }}
+            />
+            <Selector
+              dropdown
+              dropdownPosition={modelSelectorPosition}
+              defaultSelectedValue={`${currentModel}@${currentProviderName}`}
+              items={models.map((m) => ({
+                title: `${m.displayName}${
+                  m?.provider?.providerName
+                    ? " (" + m?.provider?.providerName + ")"
+                    : ""
+                }`,
+                value: `${m.name}@${m?.provider?.providerName}`,
+              }))}
+              onClose={() => setShowModelSelector(false)}
+              onSelection={(s) => {
+                if (s.length === 0) return;
+                const [model, providerName] = getModelProvider(s[0]);
+                chatStore.updateTargetSession(session, (session) => {
+                  session.mask.modelConfig.model = model as ModelType;
+                  session.mask.modelConfig.providerName =
+                    providerName as ServiceProvider;
+                  session.mask.syncGlobalConfig = false;
+                });
+                if (providerName == "ByteDance") {
+                  const selectedModel = models.find(
+                    (m) =>
+                      m.name == model &&
+                      m?.provider?.providerName == providerName,
+                  );
+                  showToast(selectedModel?.displayName ?? "");
+                } else {
+                  showToast(model);
+                }
+              }}
+            />
+          </>
         )}
 
         {supportsCustomSize(currentModel) && (

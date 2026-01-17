@@ -485,6 +485,8 @@ export function Selector<T>(props: {
   onSelection?: (selection: T[]) => void;
   onClose?: () => void;
   multiple?: boolean;
+  dropdown?: boolean; // 新增：下拉菜单模式
+  dropdownPosition?: { top: number; right: number }; // 新增：下拉菜单位置 (right 实际存储的是 center left 值)
 }) {
   const [selectedValues, setSelectedValues] = useState<T[]>(
     Array.isArray(props.defaultSelectedValue)
@@ -509,6 +511,67 @@ export function Selector<T>(props: {
     }
   };
 
+  // 下拉菜单模式
+  if (props.dropdown) {
+    return (
+      <div
+        className={styles["selector-dropdown"]}
+        style={
+          props.dropdownPosition
+            ? ({
+                bottom: `${
+                  window.innerHeight - props.dropdownPosition.top + 5
+                }px`,
+                left: `${props.dropdownPosition.right}px`,
+                transform: "translateX(-50%)",
+              } as CSSProperties)
+            : undefined
+        }
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className={styles["selector-dropdown-content"]}>
+          <List>
+            {props.items.map((item, i) => {
+              const selected = selectedValues.includes(item.value);
+              return (
+                <ListItem
+                  className={clsx(styles["selector-item"], {
+                    [styles["selector-item-disabled"]]: item.disable,
+                  })}
+                  key={i}
+                  title={item.title}
+                  subTitle={item.subTitle}
+                  icon={<Avatar model={item.value as string} />}
+                  onClick={(e) => {
+                    if (item.disable) {
+                      e.stopPropagation();
+                    } else {
+                      handleSelection(e, item.value);
+                    }
+                  }}
+                >
+                  {selected ? (
+                    <div
+                      style={{
+                        height: 10,
+                        width: 10,
+                        backgroundColor: "var(--primary)",
+                        borderRadius: 10,
+                      }}
+                    ></div>
+                  ) : (
+                    <></>
+                  )}
+                </ListItem>
+              );
+            })}
+          </List>
+        </div>
+      </div>
+    );
+  }
+
+  // 原有的全屏模态框模式
   return (
     <div className={styles["selector"]} onClick={() => props.onClose?.()}>
       <div className={styles["selector-content"]}>
