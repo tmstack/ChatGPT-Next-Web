@@ -696,9 +696,8 @@ export function ChatActions(props: {
         {showModelSelector && modelSelectorPosition && (
           <>
             <div
-              className="modal-mask"
               onClick={() => setShowModelSelector(false)}
-              style={{ zIndex: 9999 }}
+              style={{ position: "fixed", inset: 0, zIndex: 9999 }}
             />
             <Selector
               dropdown
