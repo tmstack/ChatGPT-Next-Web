@@ -353,7 +353,7 @@
 
       // 滚动条样式优化
       &::-webkit-scrollbar {
-        width: 6px;
+        width: 8px;
       }
 
       &::-webkit-scrollbar-track {
@@ -361,12 +361,12 @@
       }
 
       &::-webkit-scrollbar-thumb {
-        background-color: rgba(0, 0, 0, 0.15);
-        border-radius: 3px;
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
         transition: background-color 0.2s ease;
 
         &:hover {
-          background-color: rgba(0, 0, 0, 0.25);
+          background-color: rgba(0, 0, 0, 0.35);
         }
       }
 
